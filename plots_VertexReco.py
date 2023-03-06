@@ -15,10 +15,9 @@ infile = "predictionsVertex.csv"
 
 filein = open(str(infile))
 print("number of events: ",filein)
-df00=pd.read_csv(filein)
+df00=pd.read_csv(filein, index_col=0)
 #df00 = df000[df000['recoVtxFOM']>87.] #strict cut to avoid mis-reconstructed events
-print("df00.head() ",df00.head())
-#df0=df00[['TrueTrackLengthInWater','DNNRecoLength','lambda_max']]
+print("df00.head() \n",df00.head())
 
 data = df00['DR']
 dataprev = df00['DR_reco']
@@ -31,6 +30,8 @@ ax.set_xlabel('$\Delta R$ [cm]')
 ax.legend(('NEW','Previous'))
 #ax.xaxis.set_ticks(np.arange(0., 500., 50))
 ax.tick_params(axis='x', which='minor', bottom=False)
+title = "mean = %.2f, std = %.2f, Prev: mean = %.2f, std = %.2f " % (data.mean(), data.std(),dataprev.mean(), dataprev.std())
+plt.title(title)
 plt.show()
 fig.savefig('resol_DR.png')
 plt.close(fig)

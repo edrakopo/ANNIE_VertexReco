@@ -21,10 +21,8 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 #--------- File with events for reconstruction:
 #--- evts for prediction:
-#infile = "tankPMT_forVetrexReco.csv"
-#infile = "tankPMT_forVetrexReco_withRecoV.csv"
-#infile = "tankPMT_forVetrexReco_withRecoV.csv"
-infile = "shuffledtankPMT_forVetrexReco_withRecoV.csv"
+#infile = "shuffledtankPMT_forVetrexReco_withRecoV.csv"
+infile = "shuffled.csv"
 #
 
 # Set TF random seed to improve reproducibility
@@ -37,39 +35,41 @@ print( "--- opening file with input variables!")
 filein = open(str(infile))
 print("evts for training in: ",filein)
 Dataset=np.array(pd.read_csv(filein))
-features, rest, recovertex, labels, gridpoint = np.split(Dataset,[4401,4402,4405,4408],axis=1)
+features, rest, recovertex, labels, gridpoint = np.split(Dataset,[4400,4402,4405,4408],axis=1)
 print("rest :", rest[0])
 print("features: ",features[0])
 print("recovertex: ", recovertex[0])
 print("labels: ", labels)
-print(gridpoint[0])
+
 #split events in train/test samples:
 num_events, num_pixels = features.shape
 print(num_events, num_pixels)
 np.random.seed(0)
-train_x = features[:2000]
-train_y = labels[:2000]
-test_x = features[2000:]
-test_y = labels[2000:]
-recoVtx_y = recovertex[2000:]
+train_x = features[:3000]
+train_y = labels[:3000]
+test_x = features[3000:]
+test_y = labels[3000:]
+recoVtx_y = recovertex[3000:]
 print("test sample features shape: ", test_x.shape," test sample label shape: ", test_y.shape)
 
 # create model
 model = Sequential()
-model.add(Dense(50, input_dim=4401, kernel_initializer='normal', activation='relu'))
-#model.add(Dense(50, kernel_initializer='normal', activation='relu'))
+model.add(Dense(50, input_dim=4400, kernel_initializer='normal', activation='relu'))
 model.add(Dense(20, kernel_initializer='normal', activation='relu'))
+#model.add(Dense(10, kernel_initializer='normal', activation='relu'))
 model.add(Dense(3, kernel_initializer='normal', activation='relu'))
-#model.add(Dense(25, input_dim=4400, kernel_initializer='normal', activation='relu'))
-#model.add(Dense(25, kernel_initializer='normal', activation='relu'))
-#model.add(Dense(3, kernel_initializer='normal', activation='relu'))
 
 # load weights
-model.load_weights("weights_bets.hdf5")
+#print("Created model and loaded weights from file")
+#model.load_weights("weights_bets.hdf5")
 
 # Compile model
 model.compile(loss='mean_squared_error', optimizer='Adamax', metrics=['accuracy'])
 print("Created model and loaded weights from file")
+
+# load weights
+print("Created model and loaded weights from file")
+model.load_weights("weights_bets.hdf5")
 
 ## Predict.
 print('predicting...')
@@ -77,6 +77,8 @@ print('predicting...')
 scaler = preprocessing.StandardScaler()
 train_x = scaler.fit_transform(train_x)
 x_transformed = scaler.transform(test_x)
+
+#make predictions:
 y_predicted = model.predict(x_transformed)
 print("shapes: ", test_y.shape, ", ", y_predicted.shape)
 print("test_y: ",test_y," y_predicted: ",y_predicted)
@@ -102,9 +104,6 @@ print('MSE (sklearn): {0:f}'.format(score_sklearn))
 
 #-----------------------------
 
-print(" saving .csv file with predicted variables..")
-
-#data = np.concatenate((test_y[0], test_y[1], test_y[2], y_predicted[0], y_predicted[1], y_predicted[2]),axis=1)
 data = np.concatenate((test_y, y_predicted,recoVtx_y),axis=1)
 print(data)
 df = pd.DataFrame(data, columns=['trueX','trueY','trueZ','DNNX','DNNY','DNNZ','recoX','recoY','recoZ'])
@@ -114,5 +113,7 @@ df2 = pd.DataFrame(DR, columns=['DR'])
 df_f = pd.concat((df,df1),axis=1)
 df_final = pd.concat((df_f,df2),axis=1)
 print(df_final.head())
+
+print(" saving .csv file with predicted variables..")
 df_final.to_csv("predictionsVertex.csv", float_format = '%.3f')
 
