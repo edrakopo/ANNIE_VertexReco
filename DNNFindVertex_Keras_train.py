@@ -16,15 +16,15 @@ from sklearn import model_selection
 from sklearn import preprocessing
 from sklearn.utils import shuffle
 from tensorflow import keras
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.callbacks import ModelCheckpoint
+from tensorflow.python.keras.wrappers.scikit_learn import KerasRegressor
 
 #--------- File with events for reconstruction:
 #--- evts for training:
 #infile = "tankPMT_forVetrexReco.csv"
-infile = "shuffledtankPMT_forVetrexReco_withRecoV.csv"
+infile = "/home/evi/Desktop/ANNIE-THESIS/shuffled.csv"
 #infile2 = "../LocalFolder/data_forRecoLength_9.csv"
 #
 
@@ -36,21 +36,24 @@ print( "--- opening file with input variables!")
 #--- events for training - MC events
 filein = open(str(infile))
 print("evts for training in: ",filein)
+
 Dataset=np.array(pd.read_csv(filein))
 #np.random.shuffle(Dataset)#shuffling the data sample to avoid any bias in the training
 #print(Dataset)
-features, rest, recovertex, labels, gridpoint = np.split(Dataset,[4401,4403,4406,4409],axis=1)
+# features, rest, recovertex, labels, gridpoint = np.split(Dataset,[4401,4403,4406,4409],axis=1)
+features, rest, recovertex, labels, gridpoint, gridpointpmt = np.split(Dataset,[5500,5502,5505,5508,5509],axis=1)
 print("rest :", rest[0])
 print("features: ",features[0])
 print("recovertex: ",recovertex)
 print("labels: ", labels)
-print(gridpoint[0])
+print("gridpoint ", gridpoint)
+print("gridpoint pmt", gridpointpmt)
 #split events in train/test samples:
 num_events, num_pixels = features.shape
 print(num_events, num_pixels)
 np.random.seed(0)
 train_x = features[:2000]
-train_y = labels[:2000]
+train_y = gridpoint[:2000]
 
 print("train sample features shape: ", train_x.shape," train sample label shape: ", train_y.shape)
 
@@ -61,10 +64,10 @@ train_x = scaler.fit_transform(train_x)
 def create_model():
     # create model
     model = Sequential()
-    model.add(Dense(50, input_dim=4401, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(50, input_dim=5500, kernel_initializer='normal', activation='relu'))
 #    model.add(Dense(50, kernel_initializer='normal', activation='relu'))
     model.add(Dense(20, kernel_initializer='normal', activation='relu'))
-    model.add(Dense(3, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(1, kernel_initializer='normal', activation='relu'))
     # Compile model
     model.compile(loss='mean_squared_error', optimizer='Adamax', metrics=['accuracy'])
     return model
@@ -72,7 +75,7 @@ def create_model():
 estimator = KerasRegressor(build_fn=create_model, epochs=50, batch_size=2, verbose=0)
 
 # checkpoint
-filepath="weights_bets.hdf5"
+filepath="weights2_bets.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=True, mode='auto')
 callbacks_list = [checkpoint]
 # Fit the model
@@ -87,7 +90,7 @@ ax2.set_ylabel('Performance')
 ax2.set_xlabel('Epochs')
 ax2.set_xlim(0.,12.)
 ax2.legend(['training loss', 'validation loss'], loc='upper left')
-plt.savefig("keras_train_test.pdf")
+plt.savefig("keras_train_test2.pdf")
 #n, bins, patches = plt.hist(lambdamax, 50, density=1, facecolor='r', alpha=0.75)
 #plt.savefig("TrueTrackLengthLambdamaxhist.pdf")
 #plt.savefig("TrueTrackLengthhist.pdf")
