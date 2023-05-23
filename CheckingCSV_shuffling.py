@@ -48,27 +48,48 @@ print("np.mean(totalPMTs): ",np.mean(totalPMTs)," np.median(totalPMTs): ",np.med
 #checking shape:
 print(type(hitT)," len(hitT): ",len(hitT))
 print("hitT.shape: ", hitT.shape)
-assert(len(hitz)==len(hitT))
-assert(len(hitx)==len(hitz))
-assert(len(hitx)==len(hity))
-'''
-#Find median timevalue for each event: 
-t = hitT[hitT != 0]
-for i in range(0,2):
-    print(np.median(t[i]))
+print("hitx.shape: ",hitx.shape)
+#print(hitT)
+assert(len(hitx)==len(hitT))
 
-#med = lambda hits: [np.median(t[i]) for i in range(0,2)]
-med = lambda hits: [np.median(t[i]) for i in range(0,5)]
-print(med(t))
-median_index = np.where(t==8.21572) #med(t[0])[0])
-print(median_index)
-#median_hitT = lambda medianT: [np.median(t) for t in hitT]
-#print("median_hitT: ",median_hitT(t[0]))
-'''
+#for one event try to convert to  df: 
+def hits_medianT(dt,dx,dy,dz): 
+    d00 = pd.concat([dt, dx, dy, dz],axis=1)
+    d0 = d00[d00['T'] != 0]
+    print(d0)
+    #calculate median and its index: 
+    medianT = d0['T'].median()
+    posmedian = d0.loc[d0['T']==d0['T'].median()]
+    print("posmedian: ",posmedian," with value: ",medianT)
+
+    d0.sort_values(by='T', inplace=True)
+    print("d0 after sorting: \n", d0)
+    pos1 = d0[d0['T'] > d0['T'].median()].iloc[0]
+    pos2 = d0[d0['T'] < d0['T'].median()].iloc[-1]
+    print("pos1: ", pos1," pos2: ", pos2)
+
+    df_short = d0[d0['T']<medianT]
+    print(df_short)
+    #select the 20 first hits: 
+    df_ToUse = df_short[:20]
+    #df_ToUse = df_short.sample(n=20) #randomly select 20 hits
+    print(df_ToUse)
+    return df_ToUse
 
 
-np.random.shuffle(Dataset) #shuffling the data sample to avoid any bias in the training
+print("hitT[i][:].shape: ",hitT[0][:].shape)
+Dt = pd.DataFrame(hitT[0][:], columns = ['T'])
+Dx = pd.DataFrame(hitx[0][:], columns = ['X'])
+Dy = pd.DataFrame(hity[0][:], columns = ['Y'])
+Dz = pd.DataFrame(hitz[0][:], columns = ['Z'])
+print(hits_medianT(Dt, Dx, Dy, Dz))
+
+#call the function for all events:
+
+
+
+#np.random.shuffle(Dataset) #shuffling the data sample to avoid any bias in the training
 df = pd.DataFrame(Dataset)
-print(df.head())
-df.to_csv("shuffledevents_Timebeforemedian.csv", float_format = '%.3f')
+#print(df.head())
+#df.to_csv("shuffledevents_Timebeforemedian.csv", float_format = '%.3f')
 
