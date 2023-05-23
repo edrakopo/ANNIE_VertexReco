@@ -44,18 +44,23 @@ print("labels: ", labels)
 #split events in train/test samples:
 num_events, num_pixels = features.shape
 print(num_events, num_pixels)
-np.random.seed(0)
-train_x = features[:3000]
-train_y = labels[:3000]
+#np.random.seed(0)
+#train_x = features[:3000]
+#train_y = labels[:3000]
 test_x = features[3000:]
 test_y = labels[3000:]
 recoVtx_y = recovertex[3000:]
 print("test sample features shape: ", test_x.shape," test sample label shape: ", test_y.shape)
 
+def custom_loss_function(y_true, y_pred):
+    dist = tf.sqrt(tf.reduce_sum(tf.square(y_true - y_pred), 1))
+    return dist
+
 # create model
 model = Sequential()
-model.add(Dense(50, input_dim=4400, kernel_initializer='normal', activation='relu'))
-model.add(Dense(20, kernel_initializer='normal', activation='relu'))
+model.add(Dense(100, input_dim=4400, kernel_initializer='normal', activation='relu'))
+model.add(Dense(10, kernel_initializer='normal', activation='relu'))
+#model.add(Dense(6, kernel_initializer='normal', activation='relu'))
 #model.add(Dense(10, kernel_initializer='normal', activation='relu'))
 model.add(Dense(3, kernel_initializer='normal', activation='relu'))
 
@@ -64,7 +69,7 @@ model.add(Dense(3, kernel_initializer='normal', activation='relu'))
 #model.load_weights("weights_bets.hdf5")
 
 # Compile model
-model.compile(loss='mean_squared_error', optimizer='Adamax', metrics=['accuracy'])
+model.compile(loss=custom_loss_function, optimizer='ftrl', metrics=custom_loss_function)
 print("Created model and loaded weights from file")
 
 # load weights
@@ -74,9 +79,10 @@ model.load_weights("weights_bets.hdf5")
 ## Predict.
 print('predicting...')
 # Scale data (test set) to 0 mean and unit standard deviation.
-scaler = preprocessing.StandardScaler()
-train_x = scaler.fit_transform(train_x)
-x_transformed = scaler.transform(test_x)
+#scaler = preprocessing.StandardScaler()
+#train_x = scaler.fit_transform(train_x)
+#x_transformed = scaler.transform(test_x)
+x_transformed = test_x
 
 #make predictions:
 y_predicted = model.predict(x_transformed)
@@ -87,8 +93,10 @@ assert(len(test_y)==len(y_predicted))
 assert(len(test_y)==len(recoVtx_y))
 DR = np.empty(len(test_y))
 DR_reco = np.empty(len(test_y))
+
 import math
-print("DR0 : ", math.sqrt(((y_predicted[0][0] - test_y[0][0])**2 + (y_predicted[0][1] - test_y[0][1])**2 + (y_predicted[0][2] - test_y[0][2])**2)))
+#print("DR0 : ", math.sqrt(((y_predicted[0][0] - test_y[0][0])**2 + (y_predicted[0][1] - test_y[0][1])**2 + (y_predicted[0][2] - test_y[0][2])**2)))
+
 for i in range (0,len(y_predicted)):
      DR[i] = math.sqrt(((y_predicted[i][0] - test_y[i][0])**2 + (y_predicted[i][1] - test_y[i][1])**2 + (y_predicted[i][2] - test_y[i][2])**2))
      DR_reco[i] = math.sqrt(((recoVtx_y[i][0] - test_y[i][0])**2 + (recoVtx_y[i][1] - test_y[i][1])**2 + (recoVtx_y[i][2] - test_y[i][2])**2))

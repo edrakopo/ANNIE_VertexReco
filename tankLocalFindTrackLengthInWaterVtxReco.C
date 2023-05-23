@@ -255,7 +255,7 @@ void tankLocalFindTrackLengthInWaterVtxReco()
    //sprintf(fname,"PMTLAPPDReco_743Runs_05202019.root");//,i);
    //sprintf(fname,"data/PMTLAPPDReco_All_06082019.root");
    //sprintf(fname,"/home/liliadrak/ANNIE/ntuples_Ereco/vtxreco-beamlikegridall-cut.root");
-   sprintf(fname,"vtxreco-beamlikemrd.root");
+   sprintf(fname,"/Users/edrakopo/Desktop/Evi_scripts/vtxreco-beamlikemrd.root");
    TFile *input=new TFile(fname,"READONLY");
    cout<<"input file: "<<fname<<endl;
    //TFile f("recovtxfom.root","new");
@@ -452,7 +452,7 @@ void tankLocalFindTrackLengthInWaterVtxReco()
     //f.Close();
    input->Close();
 cout <<"Num of events with TrueTrackLengtninMRD>0="<<count2<<endl;
-//cout <<"Num of events with recovtxfom<=0:"<<count1<<endl;
+cout <<"Num of events with recovtxfom>0:"<<count1<<endl;
 }
 
 

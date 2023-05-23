@@ -21,7 +21,7 @@ print("df00.head() \n",df00.head())
 
 data = df00['DR']
 dataprev = df00['DR_reco']
-nbins=np.arange(0,200,10)
+nbins=np.arange(0,400,10)
 fig,ax=plt.subplots(ncols=1, sharey=False)#, figsize=(8, 6))
 f0=ax.hist(data, nbins, histtype='step', fill=False, color='blue',alpha=0.75) 
 f1=ax.hist(dataprev, nbins, histtype='step', fill=False, color='red',alpha=0.75)
