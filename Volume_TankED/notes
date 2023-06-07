@@ -1,0 +1,2 @@
+Scrip:t tankLocalFindTrackLengthInWaterVtxReco.C  creates the csv with hit positions and timing, true and reco vertex and gridpoint forthe true vertex. 
+Then script: GridpointToCoords.C converts all the gridpoints in an 1x1 fiducial volume to their coordinates in each grid center and stores them in a .csv. 
