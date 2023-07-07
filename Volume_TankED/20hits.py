@@ -110,10 +110,10 @@ output_df = pd.DataFrame({'nhits': totalPMTs[:, 0],
                           'truevtxX': labels[:, 0],
                           'truevtxY': labels[:, 1],
                           'truevtxZ': labels[:, 2],
-                          'Gridpoint': gridpoint[:,0]#,
-#                          'xc': cm[:, 0],
-#                          'yc': cm[:, 1],
-#                          'zc': cm[:, 2]
+                          'Gridpoint': gridpoint[:,0],
+                          'xc': cm[:, 0],
+                          'yc': cm[:, 1],
+                          'zc': cm[:, 2]
                           
 })
 
