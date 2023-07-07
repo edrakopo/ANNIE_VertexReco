@@ -89,6 +89,14 @@ print("hitT[i][:].shape: ",hitT[0][:].shape)
 Need to create a df to be used by the function hits_medianT in order to calculate the median 
 
 '''
+df_x = pd.DataFrame(hitx)
+df_y = pd.DataFrame(hity)
+df_z = pd.DataFrame(hitz)
+df_t = pd.DataFrame(hitT)
+print("df_x.head(): ",df_x.head())
+print("df_t.head(): ",df_t.head())
+print((hits_medianT(df_t,df_x,df_y,df_z)).head())
+
 new_df_x = pd.DataFrame(hitx[:, :20], columns=[f'X_{i+1}' for i in range(20)])
 new_df_y = pd.DataFrame(hity[:, :20], columns=[f'Y_{i+1}' for i in range(20)])
 new_df_z = pd.DataFrame(hitz[:, :20], columns=[f'Z_{i+1}' for i in range(20)])
@@ -119,6 +127,6 @@ print(final_df)
 # Save the modified DataFrame to a new CSV file
 # final_file = 'shuffledevents_Timebeforemedian.csv'
 
-final_file = 'tankPMT_withonlyMRDcut_insidevolume20hits.csv'
+final_file = 'VolumeTank_Texpected.csv'
 final_df.to_csv(final_file, float_format = '%.3f', index=False)
 print(f'Saved the modified data to {final_file}.')
