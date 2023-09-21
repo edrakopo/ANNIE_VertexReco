@@ -1,0 +1,4 @@
+1. Use new20.py with input csv file 'tankPMT_withonlyMRDcut_insidevolume2.csv' to calculate 20 hits under T median. The output csv is 'VolumeTank_Texpected1.csv'
+2. Use the later csv file in the Calctexp.py script to calculate the minimum gridpoint and 20 texpected. This code for all 7000 events should take aproximately 6 hours to run. 
+3. The output 'tankPMT_withonlyMRDcut_insidevolume_withTexp1707.csv' file is the final one we eill use for training. 
+4. In the DNNFindVertex_Keras_train_volume.py script we train the dataset. we use for train_x(hitT, texp, MinGrid) and train_y(cm= the centre of the true gridpoint for each event)

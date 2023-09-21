@@ -4,12 +4,14 @@
 #include "TStopwatch.h"
 #include "TF1.h"
 #include "TMath.h"
+#include <cmath>
+#include <iostream>
+#include <algorithm>
 
 //---------------------------------------------------------------------------------------------------------//
 // Find Distance between Muon Vertex and Photon Production Point (lambda)
 //---------------------------------------------------------------------------------------------------------//
-double find_lambda(double xmu_rec,double ymu_rec,double zmu_rec,double xrecDir,double yrecDir,double zrecDir,double x_pmtpos,double y_pmtpos,double z_pmtpos,double theta_cher)
-{
+double find_lambda(double xmu_rec,double ymu_rec,double zmu_rec,double xrecDir,double yrecDir,double zrecDir,double x_pmtpos,double y_pmtpos,double z_pmtpos,double theta_cher){
      double lambda1 = 0.0;    double lambda2 = 0.0;    double length = 0.0 ;
      double xmupos_t1 = 0.0;  double ymupos_t1 = 0.0;  double zmupos_t1 = 0.0;
      double xmupos_t2 = 0.0;  double ymupos_t2 = 0.0;  double zmupos_t2 = 0.0;
@@ -63,32 +65,56 @@ double find_lambda(double xmu_rec,double ymu_rec,double zmu_rec,double xrecDir,d
 //---------------------------------------------------------------------------------------------------------//
 
 
-double find_tank(double truevtxx_tank,double truevtxy_tank,double truevtxz_tank, int step) //step= 20 cm to split tank
-{
- double Gridpoint = -10;
+double find_tank(double truevtxx_tank,double truevtxy_tank,double truevtxz_tank, int step){ //step= to split tank
+
+double Gridpoint = -10;
+
   
   //gridpoint is the box no. that we find each vtx
- int  gridpoint[10][15][10], z, r, c; //first elemennt of 3d array represents "how many 2D arrays" we want
-
+ //int  gridpoint[15][20][15], z, r, c; //first elemennt of 3d array represents "how many 2D arrays" we want
+int  gridpoint[30][40][30], z, r, c;
  
  // i want to make truevtxx_tank is an array. truevtxx_tank[i]
 
- cout<<"vtx "<<truevtxx_tank<<endl;
- cout<<"vty "<<truevtxy_tank<<endl;
- cout<<"vtz "<<truevtxz_tank<<endl; 
-
-
+ //cout<<"truevtx "<<truevtxx_tank<<endl;
+ //cout<<"truevty "<<truevtxy_tank<<endl;
+ //cout<<"truevtz "<<truevtxz_tank<<endl; 
+ 
+ 
+//this is for 20cm
+/*
 //make grid
 int i = 1;
-for(int z=0; z<10 ; z++){ 
+for(int z=0; z<15 ; z++){ 
  	//cout<<"z "<<z<<endl;
  	
 
 
-	for(int r=0; r<15 ; r++){ //we need 15 rows
+	for(int r=0; r<20 ; r++){ //we need 20 rows
  	//cout<<"r "<<r<<endl;
      
- 		for(int c=0; c<10 ; c++){ //we need 10 columns
+ 		for(int c=0; c<15 ; c++){ //we need 15 columns
+ 		//cout<<"c "<<c<<endl;
+ 		
+ 			gridpoint[z][r][c] = i;
+ 			i++;
+ 			
+ 		}
+ 	}
+ }	
+ */
+ 
+ //make grid for 10cm
+int i = 1;
+for(int z=0; z<30 ; z++){ 
+ 	//cout<<"z "<<z<<endl;
+ 	
+
+
+	for(int r=0; r<40 ; r++){ //we need 40 rows
+ 	//cout<<"r "<<r<<endl;
+     
+ 		for(int c=0; c<30 ; c++){ //we need 30 columns
  		//cout<<"c "<<c<<endl;
  		
  			gridpoint[z][r][c] = i;
@@ -97,49 +123,46 @@ for(int z=0; z<10 ; z++){
  		}
  	}
  }			
+ 		
  
-
  
  //find grid number for root file values
- for(int l=0; l<181; l=l+step) { //l is z
-	cout<<"l1 "<<l<<endl;
-	if((-100+l)<truevtxz_tank && truevtxz_tank<=(-80+l)) { 
-		cout<<"l2 "<<l<<endl;
+ for(int l=0; l<291; l=l+step) { //l is z
+	//cout<<"l1 "<<l<<endl;
+	if((-150+l)<truevtxz_tank && truevtxz_tank<=(-140+l)) { 
+		//cout<<"l2 "<<l<<endl;
     	
- 		for(int j=0; j<281; j=j+step) { //j represents rows. It grows evry 20cm from -150 to 150.
-	      		cout<<"j1 "<<j<<endl;
-  			if((-150+j)<truevtxy_tank && truevtxy_tank<=(-130+j)) {
-  				cout<<"j2 "<<j<<endl;
+ 		for(int j=0; j<391; j=j+step) { //j represents rows. It grows every 10 cm from -200 to 200.
+	      		//cout<<"j1 "<<j<<endl;
+  			if((-200+j)<truevtxy_tank && truevtxy_tank<=(-190+j)) {
+  				//cout<<"j2 "<<j<<endl;
   			
-  				for(int k=0; k<181; k=k+step){
-  					cout<<"k1 "<<k<<endl;
-  					if((-100+k)<truevtxx_tank  && truevtxx_tank<=(-80+k)){ //k represents columns. It grows evry 20cm from -100 to 100.
-    				 		cout<<"k2 "<<k<<endl;
+  				for(int k=0; k<291; k=k+step){
+  					//cout<<"k1 "<<k<<endl;
+  					if((-150+k)<truevtxx_tank  && truevtxx_tank<=(-140+k)){ //k represents columns. It grows evry 10cm from -150 to 150.
+    				 		//cout<<"k2 "<<k<<endl;
     				 		
-    				 		cout<<"--- "<<(1.*l/step)<<","<<(1.*j/step)<<","<<(1.*k/step)<<endl;
+    				 		//cout<<"--- "<<(1.*l/step)<<","<<(1.*j/step)<<","<<(1.*k/step)<<endl;
                                                 Gridpoint = gridpoint[int(1.*l/step)][int(1.*j/step)][int(1.*k/step)];
-    				 		cout<<"Gridpoint= "<<Gridpoint<<endl;
+    				 		//cout<<"Gridpoint= "<<Gridpoint<<endl;
     				 	
 
  						break;
     		 		  		 		 }
-    		 		 	else cout<<"nopec"<<endl; 
+    		 		 	//else cout<<"nopec"<<endl;
     		 		}
     		 	break;}
-    		 	else cout<<"noper"<<endl;    		 	
+    		 	//else cout<<"noper"<<endl;    		 	
     		 }
 break;}
-else{ cout<<"nopez" <<endl;}
+//else{ cout<<"nopez" <<endl;}
 }
 
-
-
-return Gridpoint;
+	
+    return Gridpoint;
 }
-  
 
-		
-		
+			
 		
 void tankLocalFindTrackLengthInWaterVtxReco()
 {
@@ -149,14 +172,22 @@ void tankLocalFindTrackLengthInWaterVtxReco()
    float diffDirAbs2=0; 
    float dirX2=0; float dirY2=0; float dirZ2=0;
    float vtxX2=0; float vtxY2=0; float vtxZ2=0;
-
+   double C_VAC=29.9792458; //speed of light in vacuum [cm/ns]
+   
    ofstream csvfile;
    //csvfile.open ("data_forRecoLength_05202019.csv");
    //csvfile.open ("data/data_forRecoLength_06082019.csv");
    //csvfile.open ("data/data_forRecoLength_06082019CC0pi.csv"); //events with no pi's
    //csvfile.open ("data_forRecoLength_beamlikeEvts.csv");
-   csvfile.open ("tankPMT_forVetrexReco_withRecoV.csv");
+   //csvfile.open ("tankPMT_forVetrexReco_300hits.csv");
+   //csvfile.open ("tankPMT_forVetrexReco_tencmRecoGridpoint.csv");
+   csvfile.open ("tankPMT_forVetrexReco_final.csv");
+    //csvfile.open ("tankPMT_withonlyMRDcut.csv");
+   
+   ofstream csvfile2;
+   //csvfile2.open ("tank_20hits_Tmedian.csv");
    int maxhits0=1100; 
+   //int maxhits0=300; 
       //--- write to file: ---//
       //if(first==1 && deny_access==0){
       //    deny_access=1;
@@ -182,6 +213,7 @@ void tankLocalFindTrackLengthInWaterVtxReco()
              X_name.append(temp_str4);
              const char * xxname = X_name.c_str();
              csvfile<<xxname<<",";
+             csvfile2<<xxname<<",";
           }
           //y
           for (int yy=0; yy<maxhits0;++yy){ 
@@ -192,6 +224,7 @@ void tankLocalFindTrackLengthInWaterVtxReco()
              Y_name.append(temp_str4);
              const char * yname = Y_name.c_str();
              csvfile<<yname<<",";
+             csvfile2<<yname<<",";
           }
           //z
           for (int zz=0; zz<maxhits0;++zz){
@@ -202,6 +235,7 @@ void tankLocalFindTrackLengthInWaterVtxReco()
              Z_name.append(temp_str4);
              const char * zname = Z_name.c_str();
              csvfile<<zname<<",";
+             csvfile2<<zname<<",";
           }
 
           
@@ -213,8 +247,21 @@ void tankLocalFindTrackLengthInWaterVtxReco()
              T_name.append(temp_str4);
              const char * tname = T_name.c_str();
              csvfile<<tname<<",";
+             csvfile2<<tname<<",";
           }
           
+          /*
+          for (int ii=0; ii<maxhits0;++ii){
+             stringstream strs4;
+             strs4 << ii;
+             string temp_str4 = strs4.str();
+             string Q_name= "Q_";
+             Q_name.append(temp_str4);
+             const char * qname = Q_name.c_str();
+             csvfile<<qname<<",";
+          }
+	*/
+      
         
         //csvfile<<"lambda_max"<<","; //first estimation of track length(using photons projection on track)
         csvfile<<"totalPMTs"<<",";
@@ -222,7 +269,7 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         /*
         csvfile<<"lambda_max"<<",";
         csvfile<<"TrueTrackLengthInWater"<<",";
-        //csvfile<<"neutrinoE"<<",";    //comment
+        csvfile<<"neutrinoE"<<",";   
         csvfile<<"trueKE"<<",";
         csvfile<<"diffDirAbs"<<",";
         csvfile<<"TrueTrackLengthInMrd"<<",";
@@ -230,10 +277,12 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         csvfile<<"recoDWallZ"<<",";
         csvfile<<"dirX"<<",";
         csvfile<<"dirY"<<",";
-        csvfile<<"dirZ"<<",";*/
-        csvfile<<"vtxX"<<",";
-        csvfile<<"vtxY"<<",";
-        csvfile<<"vtxZ"<<",";
+        csvfile<<"dirZ"<<",";
+        */
+
+        csvfile<<"recovtxX"<<",";
+        csvfile<<"recovtxY"<<",";
+        csvfile<<"recovtxZ"<<",";
         /*
         csvfile<<"truedirX"<<",";
         csvfile<<"truedirY"<<",";
@@ -242,20 +291,43 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         csvfile<<"truevtxX"<<",";
         csvfile<<"truevtxY"<<",";
         csvfile<<"truevtxZ"<<",";
-        csvfile<<"Gridpoint";
+        csvfile<<"Gridpoint"<<",";
+        csvfile<<"GridpointReco";
+        /*
+        for (int ii=0; ii<maxhits0;++ii){
+             stringstream strs4;
+             strs4 << ii;
+             string temp_str4 = strs4.str();
+             string pmt_name= "gridPMT_";
+             pmt_name.append(temp_str4);
+             const char * pmtname = pmt_name.c_str();
+             csvfile<<pmtname<<",";
+          }
+          
+          */
+        //csvfile<<"GridpointPMT"<<",";
         //csvfile<<"recoVtxFOM";
         //csvfile<<"recoStatus"<<",";  //comment
         //csvfile<<"deltaVtxR"<<",";   //comment
         //csvfile<<"deltaAngle";       //comment
         csvfile<<'\n';
+        csvfile2<<"recovtxX"<<",";
+        csvfile2<<"recovtxY"<<",";
+        csvfile2<<"recovtxZ"<<",";
+        csvfile2<<"truevtxX"<<",";
+        csvfile2<<"truevtxY"<<",";
+        csvfile2<<"truevtxZ"<<",";
+        csvfile2<<"Gridpoint"<<",";
+        csvfile2<<"GridpointReco";
+        
+	csvfile2<<'\n';
 
-
-   char fname[100]; int count1=0, count2=0;
+   char fname[100]; int count1=0, count2=0, count3=0;
    //sprintf(fname,"PhaseIIReco_SuccessfulReco_04202019.root");//,i);
    //sprintf(fname,"PMTLAPPDReco_743Runs_05202019.root");//,i);
    //sprintf(fname,"data/PMTLAPPDReco_All_06082019.root");
    //sprintf(fname,"/home/liliadrak/ANNIE/ntuples_Ereco/vtxreco-beamlikegridall-cut.root");
-   sprintf(fname,"vtxreco-beamlikemrd.root");
+   sprintf(fname,"/home/evi/Desktop/ANNIE-THESIS/beamlikemu/Data/vtxreco-beamlikemrd.root");
    TFile *input=new TFile(fname,"READONLY");
    cout<<"input file: "<<fname<<endl;
    //TFile f("recovtxfom.root","new");
@@ -266,12 +338,13 @@ void tankLocalFindTrackLengthInWaterVtxReco()
   
    Int_t run, event, nhits, trigger, recoStatus;
    double recoVtxFOM, deltaVtxR, deltaAngle;
-   double truevtxX,truevtxY,truevtxZ,truedirX,truedirY,truedirZ,vtxX,vtxY,vtxZ,dirX,dirY,dirZ,TrueTrackLengthInMrd,TrueTrackLengthInWater,TrueNeutrinoEnergy,trueEnergy,TrueMomentumTransfer,TrueMuonAngle;
+   double truevtxX,truevtxY,truevtxZ,truedirX,truedirY,truedirZ,vtxX,vtxY,vtxZ,dirX,dirY,dirZ, TrueTrackLengthInMrd,TrueTrackLengthInWater,TrueNeutrinoEnergy,trueEnergy,TrueMomentumTransfer,TrueMuonAngle;
    std::string *TrueInteractionType = 0;
    std::vector<double> *digitX=0; std::vector<double> *digitY=0;  std::vector<double> *digitZ=0;
-   std::vector<double> *digitT=0; std::vector<int>  *digitType=0;
+   std::vector<double> *digitT=0; std::vector<int>  *digitType=0; std::vector<double> *digitQ=0;
+   //std::vector<double> *seedX=0; std::vector<double> *seedY=0; std::vector<double> *seedZ=0;
    float trueMuonEnergy=0.;
-   int Pi0Count,PiPlusCount,PiMinusCount, Gridpoint;
+   int Pi0Count,PiPlusCount,PiMinusCount, Gridpoint, GridpointPMT, GridpointReco;
 
    regTree->SetBranchAddress("runNumber", &run);
    regTree->SetBranchAddress("eventNumber", &event);
@@ -288,9 +361,13 @@ void tankLocalFindTrackLengthInWaterVtxReco()
    regTree->SetBranchAddress("trueVtxX", &truevtxX);
    regTree->SetBranchAddress("trueVtxY", &truevtxY);
    regTree->SetBranchAddress("trueVtxZ", &truevtxZ);
+   //regTree->SetBranchAddress("seedVtxX", &seedX);
+   //regTree->SetBranchAddress("seedVtxY", &seedY);
+   //regTree->SetBranchAddress("seedVtxZ", &seedZ);
    regTree->SetBranchAddress("trueDirX", &truedirX);
    regTree->SetBranchAddress("trueDirY", &truedirY);
    regTree->SetBranchAddress("trueDirZ", &truedirZ);
+   regTree->SetBranchAddress("hitQ", &digitQ);
    regTree->SetBranchAddress("hitT", &digitT);
    regTree->SetBranchAddress("hitX", &digitX);
    regTree->SetBranchAddress("hitY", &digitY);
@@ -313,31 +390,46 @@ void tankLocalFindTrackLengthInWaterVtxReco()
   
    cout<<"regTree->GetEntries(): "<<regTree->GetEntries()<<endl;
   // double DR;
-  for (Long64_t ievt=0; ievt<regTree->GetEntries(); ievt++) {
- //for (Long64_t ievt=0; ievt<1000; ievt++) {
+ // for (Long64_t ievt=0; ievt<regTree->GetEntries(); ievt++) {
+ for (Long64_t ievt=0; ievt<regTree->GetEntries(); ievt++) {
    regTree->GetEntry(ievt);
-  //if(recoVtxFOM<=0){
-  //  DR=TMath::Sqrt((vtxX-truevtxX)*(vtxX-truevtxX)+(vtxY-truevtxY)*(vtxY-truevtxY)+(vtxZ-truevtxZ)*(vtxZ-truevtxZ));
-  //  h1.Fill(DR);
-  //}
+ 	//if(recoVtxFOM<=0){
+  // DR=TMath::Sqrt((vtxX-truevtxX)*(vtxX-truevtxX)+(vtxY-truevtxY)*(vtxY-truevtxY)+(vtxZ-truevtxZ)*(vtxZ-truevtxZ));
+ //  h1.Fill(DR); 
+  // }
    double lambda_min = 10000000;  double lambda_max = -99999999.9; double lambda = 0;
    int totalPMTs=0; int totalLAPPDs=0; recoDWallR2=0; recoDWallZ2=0; diffDirAbs2=0;
-   double lambda_vec[1100]={0.}; double digitt[1100]={0.}; double digitx[1100]={0.}; double digity[1100]={0.}; double digitz[1100]={0.};
+   double lambda_vec[1100]={0.}; double digitt[1100]={0.}; double digitq[1100]={0.}; double digitx[1100]={0.}; double digity[1100]={0.}; double digitz[1100]={0.}; double gridpmt[1100]={0.}; 
+   double dr[1100]={0.};
    cout << "ievt:" << ievt <<endl; //printing the events number to check if all the events are being run
    //if(recoStatus == 0){ count1++;
+   
    if(recoVtxFOM>0){ count1++;
-	   cout<<"count1: "<<count1<<endl;
+	//   cout<<"count1: "<<count1<<endl;
+     //if(nhits>10){count3++;
      //if((*TrueInteractionType == "QES - Weak[CC]") && TrueTrackLengthInMrd>0.){
       //cout<<"TrueTrackLengthInMrd: "<<TrueTrackLengthInMrd<<endl;
       
       if(TrueTrackLengthInMrd>0){count2++;// && Pi0Count==0 && PiPlusCount==0 && PiMinusCount==0){
         cout<<"ievt: "<<ievt<<" trueEnergy: "<<trueEnergy<<" with nhits: "<<nhits<<endl;
-	Gridpoint=find_tank(truevtxX,truevtxY,truevtxZ, 20);
+	//Gridpoint=find_tank(truevtxX,truevtxY, truevtxZ, 20);
+	Gridpoint=find_tank(truevtxX,truevtxY, truevtxZ, 10);
+	GridpointReco =find_tank(vtxX,vtxY,vtxZ, 10);
+	
+	/*
 	cout<< "gridPoint:"<< Gridpoint<<endl;
+	cout<< "gridPointRECO:"<< GridpointReco<<endl;
+	cout<< "\n";
 	//cout<< "tank:"<< find_tank(truevtxX,truevtxY, truevtxZ, 20)<<endl;
 	cout<< "truevtxX:"<< truevtxX<<endl;
 	cout<< "truevtxY:"<< truevtxY<<endl;
 	cout<< "truevtxZ:"<< truevtxZ<<endl;
+	cout<< "\n";
+	cout<< "recovtxX:"<< vtxX<<endl;
+	cout<< "recovtxY:"<< vtxY<<endl;
+	cout<< "recovtxZ:"<< vtxZ<<endl;
+	cout<< "\n";
+	*/
 	
         //calculate diff dir with (0,0,1)
         double diffDirAbs0 = TMath::ACos(dirZ)*TMath::RadToDeg();
@@ -347,7 +439,6 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         double recoDWallR = 152.4-TMath::Sqrt(recoVtxR2);
         double recoDWallZ = 198-TMath::Abs(vtxY);
         
-        
 
         for(int k=0; k<nhits; k++){
           //std::cout<<"k: "<<k<<", "<<digitT->at(k)<<" | "<<digitType->at(k)<<std::endl;
@@ -355,6 +446,14 @@ void tankLocalFindTrackLengthInWaterVtxReco()
           digitx[k]=digitX->at(k);
           digity[k]=digitY->at(k);
           digitz[k]=digitZ->at(k);
+          digitq[k]=digitQ->at(k);
+       
+      
+	  GridpointPMT=find_tank( digitx[k], digity[k], digitz[k], 10);
+	  //cout<<"gridpointPMT "<<GridpointPMT<<endl;
+	  
+	  gridpmt[k]=GridpointPMT;
+	  //cout<<"gridpmt2 "<<gridpmt[k]<<endl;
           
           //if( (digitType->at(k)) == "PMT8inch"){ totalPMTs++; }
           //if( (digitType->at(k)) == "lappd_v0"){ totalLAPPDs++; }
@@ -393,19 +492,33 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         //for(int i=0; i<maxhits0;++i){
            //csvfile<<lambda_vec[i]<<",";
         //}
-        
+      
+
         for(int i=0; i<maxhits0;++i){
            csvfile<<digitx[i]<<",";
+           csvfile2<<digitx[i]<<",";
         }
         for(int i=0; i<maxhits0;++i){
            csvfile<<digity[i]<<",";
+           csvfile2<<digity[i]<<",";
         }
         for(int i=0; i<maxhits0;++i){
            csvfile<<digitz[i]<<",";
+           csvfile2<<digitz[i]<<",";
         }
         for(int i=0; i<maxhits0;++i){
-            csvfile<<digitt[i]<<",";
+           csvfile<<digitt[i]<<",";
+           csvfile2<<digitt[i]<<",";
         }
+        /*
+        for(int i=0; i<maxhits0;++i){
+           csvfile<<digitq[i]<<",";
+           
+        }
+        */
+      
+       
+       
         
         //csvfile<<lambda_max<<",";
         //csvfile<<totalPMTs<<",";
@@ -422,7 +535,8 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         csvfile<<recoDWallZ2<<",";
         csvfile<<dirX2<<",";
         csvfile<<dirY2<<",";
-        csvfile<<dirZ2<<",";*/
+        csvfile<<dirZ2<<",";
+        */
         csvfile<<vtxX2<<",";
         csvfile<<vtxY2<<",";
         csvfile<<vtxZ2<<",";
@@ -434,24 +548,46 @@ void tankLocalFindTrackLengthInWaterVtxReco()
         csvfile<<truevtxX<<",";
         csvfile<<truevtxY<<",";
         csvfile<<truevtxZ<<",";
-        csvfile<<Gridpoint;
+        
+        csvfile<<Gridpoint<<",";
+        csvfile<<GridpointReco;
+        /*
+        for(int i=0; i<maxhits0;++i){
+           csvfile<<gridpmt[i]<<",";
+           //cout<<"gridpmt3 "<<gridpmt[i]<<endl;
+        }
+        */
+        
+        //csvfile<<GridpointPMT;
         //csvfile<<recoVtxFOM;
         //csvfile<<recoStatus<<",";
         //csvfile<<deltaVtxR<<",";
         //csvfile<<deltaAngle;
         csvfile<<'\n';
+        csvfile2<<vtxX2<<",";
+        csvfile2<<vtxY2<<",";
+        csvfile2<<vtxZ2<<",";
+        csvfile2<<truevtxX<<",";
+        csvfile2<<truevtxY<<",";
+        csvfile2<<truevtxZ<<",";
+        csvfile2<<Gridpoint<<",";
+        csvfile2<<GridpointReco;
+        
+        csvfile2<<'\n';
         
 	}
         //------------------------
-	cout<<vtxX2<<truevtxX<<endl;
-   	
-     }
+	//cout<<vtxX2<<truevtxX<<endl;
+   	//cout<< "gridPointttttttt:"<< Gridpoint<<endl;
+       }
+     // fom}
     }
     
     //h1.Write();
     //f.Close();
    input->Close();
-cout <<"Num of events with TrueTrackLengtninMRD>0="<<count2<<endl;
+//cout <<"Num of events with nhits>0="<<count3<<endl;
+cout <<"Num of events with TrueTrackLengtninMRD>10="<<count2<<endl;
 //cout <<"Num of events with recovtxfom<=0:"<<count1<<endl;
 }
 

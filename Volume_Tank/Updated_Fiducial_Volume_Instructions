@@ -1,0 +1,14 @@
+INSTRUCTIONS TO USE FIDUCIAL VOLUME ANALYSIS
+
+-from C++ code "tankLocalFindTrackLengthInWaterVtxReco.C" get the original csv file and make adjustments acoording to what you need in csv and with what cuts (FOM, MRD, nhits)
+-C++ code "GridpointToCoords.C" gives 1000 gridpoints for the fiducial volume 
+- we use the "tankPMT_withonlyMRDcut_insidevolume_2407.csv" code in LocateCentreVertex.py which locates the centre of the gridpoint in csv and stores it as 3 new columns xc, yc, zc
+NOTE! I use the same name for csv and therefore is rewritten. Someone could store each step in new csv (which is also probably smarter)
+-Use new20.py script with the "tankPMT_withonlyMRDcut_insidevolume_2407.csv" to calculate 20 hits that are under T median. The output csv is "tankPMT_withonlyMRDcut_insidevolume2407.csv"
+NOTE! new20.py needs to be updated to add columns 'recovtxX','recovtxY','recovtxZ','recoVtxFOM'.
+Use the later csv file in the Calctexp.py script to calculate the minimum gridpoint coordinates and 20 texpected. This code for all 7000 events should take aproximately 6-7 hours to run. 
+The output file is "tankPMT_withonlyMRDcut_insidevolume_withTexp2407"
+NOTE! Some lines might have a lot of commas as a column (108) which is because there are not enough hits under T median, so the code stores nothing. 
+-To fix that as a first step we remove these lines from csv completely with drop.py. New csv name is "tankPMT_withonlyMRDcut_insidevolume_withTexp2407_new"
+-Using VshuufleEventsbyline.py we shuffle the events and then chack if everything is read correctly in VcheckingShuffledEventsbyline.py and we have our final csv to be used for training "shuffled_tankPMT_withonlyMRDcut_insidevolume_withTexp2407.csv"
+-Finally use train and predict codes.
