@@ -9,6 +9,12 @@ Steps to run this analysis:
 
 4) 20hits.py : finds the first 20 hits with respect to median and stores them in a csv file (shuffledcsv_20hits_perevt.csv).
 
-4) calc_expTime.py : calculates the expected hit time for each grid point ccordiante (1000 gridpoints in an 1x1 FV) and finds the gridpoint with the minimum dt = texpected - tmeasured. Eventually it creates a .csv with hitTime, texpected, grdpoint_coordinates, true_vertex , the input variables for the DNN algorithm. 
+5) drop.py : script to remove lines with nan values corresponding to events with hits<20. 
 
+6) DNNFindVertex_Keras_train_volume.py : trains the DNN
+
+7) DNNFindVertex_Keras_predict_volume.py : predicts the values
+
+8) plots_VertexReco.py : creates plots 
+----------------------- ----------------------- ----------------------- ----------------------- 
 Supplementary Scripts: LocateCentreVertex.py : converts all the gridpoints in an 1x1 fiducial volume to their coordinates in each grid center and stores them as columns in the csv from step1. 
