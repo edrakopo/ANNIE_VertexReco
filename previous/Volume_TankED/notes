@@ -1,0 +1,11 @@
+Steps to run this analysis:
+
+1) Script: tankLocalFindTrackLengthInWaterVtxReco.C  creates the csv with hit positions and timing, true and reco vertex and gridpoint forthe true vertex. 
+
+2) Script: GridpointToCoords.C converts all the gridpoints in an 1x1 fiducial volume to their coordinates in each grid center and stores them in a .csv.)
+
+3) 20hits.py : finds the first 20 hits with respect to median and stores them in a csv file (VolumeTank_Texpected.csv).-Currently we need to fix that step to use hits before median!!!
+
+4) calc_expTime.py : calculates the expected hit time for each grid point ccordiante (1000 gridpoints in an 1x1 FV) and finds the gridpoint with the minimum dt = texpected - tmeasured. Eventually it creates a .csv with hitTime, texpected, grdpoint_coordinates, true_vertex , the input variables for the DNN algorithm. 
+
+Supplementary Scripts: LocateCentreVertex.py : converts all the gridpoints in an 1x1 fiducial volume to their coordinates in each grid center and stores them as columns in the csv from step1. 
